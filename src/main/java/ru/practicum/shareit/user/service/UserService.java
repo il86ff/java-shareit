@@ -29,7 +29,7 @@ public class UserService {
 
     public User update(UserDto user, Long id) {
         log.debug("Попытка обновления пользователя {}", user);
-        if (user.getEmail() !=null && !getById(id).getEmail().equals(user.getEmail())) {
+        if (user.getEmail() != null && !getById(id).getEmail().equals(user.getEmail())) {
             isValidNotDuplicateEmail(user.getEmail());
         }
         UserDto userDto = UserMapper.toUserDto(user, getById(id));

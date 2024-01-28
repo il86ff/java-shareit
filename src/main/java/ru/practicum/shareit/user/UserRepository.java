@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public class UserRepository {
-    private final Map<Long,User> users;
+    private final Map<Long, User> users;
     private Long id = 0L;
 
     public UserRepository() {
@@ -27,10 +27,11 @@ public class UserRepository {
     }
 
     public User update(User user, Long id) {
-            users.put(id, user);
-            return users.get(id);
+        users.put(id, user);
+        return users.get(id);
     }
-    public Optional<User> getById(Long id){
+
+    public Optional<User> getById(Long id) {
         return Optional.ofNullable(users.get(id));
     }
 

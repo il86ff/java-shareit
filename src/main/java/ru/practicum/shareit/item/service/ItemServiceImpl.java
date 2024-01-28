@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl implements ItemService {
+    private static final String NOT_FOUND_MESSAGE = "предмет с id = %s не найден...";
     private final ItemRepository itemRepository;
     private final UserService userService;
-    private static final String NOT_FOUND_MESSAGE = "предмет с id = %s не найден...";
 
     public ItemServiceImpl(ItemRepository itemRepository, UserService userService) {
         this.itemRepository = itemRepository;
@@ -41,7 +41,7 @@ public class ItemServiceImpl implements ItemService{
         userService.getById(userId);
         Item oldItem = getItemById(id, userId);
         if (oldItem.getUserId().compareTo(userId) != 0)
-            throw new ItemOwnerMismatchException(String.format("предмет пренадлежит другому пользователю..."));
+            throw new ItemOwnerMismatchException("предмет пренадлежит другому пользователю...");
         Item itemUpdate = ItemMapper.dtoItemUpdate(item, oldItem, userId);
         itemUpdate.setId(id);
         return itemRepository.update(itemUpdate, id, userId);
@@ -60,25 +60,18 @@ public class ItemServiceImpl implements ItemService{
 
     @Override
     public Collection<Item> getItemBySearch(String text) {
-        if(text.isBlank()) {
+        if (text.isBlank()) {
             return List.of();
         }
         log.debug("Получение дынных о предмете по маске %{}%", text);
-        return itemRepository.getAllItems().stream()
-                .filter(item -> item.getDescription().toUpperCase().contains(text.toUpperCase())
-                            || item.getName().toUpperCase().contains(text.toUpperCase()))
-                .filter(Item::getAvailable)
-                .collect(Collectors.toList());
+        return itemRepository.getAllItems().stream().filter(item -> item.getDescription().toUpperCase().contains(text.toUpperCase()) || item.getName().toUpperCase().contains(text.toUpperCase())).filter(Item::getAvailable).collect(Collectors.toList());
     }
 
     @Override
     public Collection<Item> getItemByUser(Long userId) {
         log.debug("Получение дынных о предметах с владельцем ID = {}", userId);
         userService.getById(userId);
-        return itemRepository.getAllItems().stream()
-                .filter(item -> item.getUserId().compareTo(userId) == 0)
-                .filter(Item::getAvailable)
-                .collect(Collectors.toList());
+        return itemRepository.getAllItems().stream().filter(item -> item.getUserId().compareTo(userId) == 0).filter(Item::getAvailable).collect(Collectors.toList());
     }
 
     private void validationItem(ItemDto itemDto) {
