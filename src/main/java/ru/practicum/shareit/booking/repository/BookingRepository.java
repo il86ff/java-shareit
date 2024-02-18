@@ -7,8 +7,12 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBookerIdOrderByStartDesc(Long id);
+
     List<Booking> findByItem_User_IdOrderByStartDesc(Long id);
+
     List<Booking> findByItem_User_IdOrderByEndDesc(Long id);
+
     List<Booking> findByItem_IdOrderByEndDesc(Long itemId);
+
     List<Booking> findByBooker_IdAndItem_Id(Long userId, Long itemId);
 }
