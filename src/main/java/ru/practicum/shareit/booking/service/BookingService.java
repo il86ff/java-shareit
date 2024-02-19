@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingStatus;
 import ru.practicum.shareit.booking.entity.Booking;
@@ -28,6 +29,7 @@ public class BookingService {
     private final ItemRepository itemRepository;
     private final UserService userService;
 
+    @Transactional
     public Booking create(BookingDto bookingDto, Long id) {
         Item item;
         LocalDateTime time = LocalDateTime.now();
@@ -49,6 +51,7 @@ public class BookingService {
         }
     }
 
+    @Transactional
     public Booking update(Long bookingId, Long userId, Boolean approved) {
         if (bookingRepository.findById(bookingId).isPresent()) {
             Booking bookingUpdate = bookingRepository.findById(bookingId).get();
@@ -70,6 +73,7 @@ public class BookingService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Collection<Booking> getAllBookingByUser(Long id, BookingStatus state) {
         LocalDateTime time = LocalDateTime.now();
         Collection<Booking> collectionBooking = bookingRepository.findByBookerIdOrderByStartDesc(id);
@@ -80,6 +84,7 @@ public class BookingService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Booking getBookingByUser(Long bookingId, Long userId) {
         if (bookingRepository.findById(bookingId).isPresent()) {
             Booking booking = bookingRepository.findById(bookingId).get();
@@ -93,6 +98,7 @@ public class BookingService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Collection<Booking> getAllBookingItemByUser(Long id, BookingStatus state) {
         LocalDateTime time = LocalDateTime.now();
         Collection<Booking> collectionBooking = bookingRepository.findByItem_User_IdOrderByStartDesc(id);

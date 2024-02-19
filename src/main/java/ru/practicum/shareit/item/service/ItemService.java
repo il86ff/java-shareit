@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemOwnerMismatchException;
@@ -42,6 +43,7 @@ public class ItemService {
         this.commentRepository = commentRepository;
     }
 
+    @Transactional
     public Item create(ItemDto itemDto, Long id) {
         log.debug("Попытка создания предмета {}", itemDto);
         validationItem(itemDto);
@@ -50,6 +52,7 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
+    @Transactional
     public Item update(ItemDto item, Long id, Long userId) {
         log.debug("Попытка обновления предмета {}", item);
         User user = userService.getById(userId);
@@ -65,6 +68,7 @@ public class ItemService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ItemDataDto getItemById(Long id, Long userID) {
         log.debug("Получение дынных о предмете с ID = {}", id);
         if (itemRepository.findById(id).isPresent()) {
@@ -85,6 +89,7 @@ public class ItemService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Collection<Item> getItemBySearch(String text) {
         if (text.isBlank()) {
             return List.of();
@@ -93,6 +98,7 @@ public class ItemService {
         return itemRepository.findByNameOrDescriptionContainingIgnoreCase(text, text).stream().filter(Item::getAvailable).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public Collection<ItemDataDto> getItemByUser(Long userId) {
         log.debug("Получение дынных о предметах с владельцем ID = {}", userId);
         userService.getById(userId);
@@ -125,6 +131,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public Comment addComment(CommentDto commentDto, Long id, Long itemId) {
         LocalDateTime time = LocalDateTime.now();
         List<Booking> booking = bookingRepository.findByBooker_IdAndItem_Id(id, itemId).stream().filter(b -> b.getEnd().isBefore(time)).collect(Collectors.toList());
