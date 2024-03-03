@@ -1,8 +1,11 @@
 package ru.practicum.shareit.item.controller;
 
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDataDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.entity.Comment;
+import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -11,8 +14,8 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/items")
 public class ItemController {
-    private final ItemService itemService;
     private static final String HEADER_X_SHARER_USER_ID = "X-Sharer-User-Id";
+    private final ItemService itemService;
 
     public ItemController(ItemService itemService) {
         this.itemService = itemService;
@@ -32,18 +35,25 @@ public class ItemController {
     }
 
     @GetMapping("{id}")
-    public Item getItemById(@Valid @PathVariable Long id, @RequestHeader(HEADER_X_SHARER_USER_ID) Long userId) {
+    public ItemDataDto getItemById(@Valid @PathVariable Long id, @RequestHeader(HEADER_X_SHARER_USER_ID) Long userId) {
         return itemService.getItemById(id, userId);
     }
 
     @GetMapping
-    public Collection<Item> getItemById(@RequestHeader(HEADER_X_SHARER_USER_ID) Long userId) {
+    public Collection<ItemDataDto> getItemById(@RequestHeader(HEADER_X_SHARER_USER_ID) Long userId) {
         return itemService.getItemByUser(userId);
     }
 
     @GetMapping("/search")
     public Collection<Item> getItemBySearch(@RequestParam String text, @RequestHeader(HEADER_X_SHARER_USER_ID) Long userId) {
         return itemService.getItemBySearch(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public Comment addComment(@Valid @RequestBody CommentDto commentDto,
+                              @RequestHeader(HEADER_X_SHARER_USER_ID) Long id,
+                              @PathVariable Long itemId) {
+        return itemService.addComment(commentDto, id, itemId);
     }
 
 }

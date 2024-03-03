@@ -3,14 +3,17 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import ru.practicum.shareit.exception.DuplicateEmailException;
 import ru.practicum.shareit.exception.EmptyEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.entity.User;
 import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Collection;
 
 @Slf4j
@@ -20,13 +23,19 @@ public class UserService {
     private static final String NOT_FOUND_MESSAGE = "пользователь с id = %s не найден...";
     private final UserRepository userRepository;
 
-    public User create(UserDto userDto) {
+    @Transactional
+    public User create(@RequestBody UserDto userDto) {
         log.debug("Попытка создания пользователя {}", userDto);
         if (userDto.getEmail() == null) throw new EmptyEmailException("передан пустой email...");
-        isValidNotDuplicateEmail(userDto.getEmail());
-        return userRepository.create(userDto);
+        try {
+            User newUser = UserMapper.dtoToUser(userDto);
+            return userRepository.save(newUser);
+        } catch (ConstraintViolationException | NullPointerException s) {
+            throw new DuplicateEmailException(String.format("Не верный email у пользователя %s", userDto.getId()));
+        }
     }
 
+    @Transactional
     public User update(UserDto user, Long id) {
         log.debug("Попытка обновления пользователя {}", user);
         if (user.getEmail() != null && !getById(id).getEmail().equals(user.getEmail())) {
@@ -35,37 +44,39 @@ public class UserService {
         UserDto userDto = UserMapper.toUserDto(user, getById(id));
         User updatedUser = UserMapper.dtoToUser(userDto);
         updatedUser.setId(id);
-        return userRepository.update(updatedUser, id);
+        return userRepository.save(updatedUser);
     }
 
+    @Transactional(readOnly = true)
     public User getById(Long id) {
         log.debug("Получение данных о пользователе с ID = {}", id);
-        if (userRepository.getById(id).isPresent()) {
-            return userRepository.getById(id).get();
+        if (userRepository.findById(id).isPresent()) {
+            return userRepository.findById(id).get();
         } else {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE, id));
         }
     }
 
+    @Transactional(readOnly = true)
     public Collection<User> getAllUsers() {
         log.debug("Получение всех пользователей");
-        return userRepository.getAllUsers();
+        return userRepository.findAll();
     }
 
-    public User deleteUser(Long id) {
+    @Transactional
+    public void deleteUser(Long id) {
         log.debug("Удаление пользователя с ID = {}", id);
-        if (userRepository.getById(id).isPresent()) {
-            return userRepository.deleteUser(id);
+        if (userRepository.findById(id).isPresent()) {
+            userRepository.deleteById(id);
         } else {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE, id));
         }
     }
 
-    private boolean isValidNotDuplicateEmail(String email) {
-        for (User u : userRepository.getAllUsers()) {
-            if (u.getEmail().equals(email))
-                throw new DuplicateEmailException(String.format("Пользователь с email = %s уже существует", email));
+    @Transactional(readOnly = true)
+    private void isValidNotDuplicateEmail(String email) {
+        if (userRepository.findByEmailContainingIgnoreCase(email).isPresent()) {
+            throw new DuplicateEmailException(String.format("Пользователь с email = %s уже существует", email));
         }
-        return true;
     }
 }

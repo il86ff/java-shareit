@@ -1,5 +1,7 @@
 package ru.practicum.shareit.exception;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +65,16 @@ public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
                 .body(messages);
     }
 
+    @ExceptionHandler({EmptyResultSet.class})
+    public ResponseEntity<Set<String>> handleException(EmptyResultSet exception) {
+        Set<String> messages = new HashSet<>();
+        messages.add(exception.getMessage());
+        log.error("Ошибка заполнения тела запроса: {}", messages);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(messages);
+    }
+
     @ExceptionHandler(ValidationItemException.class)
     public ResponseEntity<Set<String>> handleException(ValidationItemException exception) {
         Set<String> messages = new HashSet<>();
@@ -81,5 +93,21 @@ public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(messages);
+    }
+
+    @ExceptionHandler(UnknownState.class)
+    public ResponseEntity<UnknownStateException> handleException(UnknownState exception) {
+        Set<String> messages = new HashSet<>();
+        messages.add(exception.getMessage());
+        log.error("Unknown State: {}", messages);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new UnknownStateException(exception.getMessage()));
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class UnknownStateException {
+        private String error;
     }
 }
