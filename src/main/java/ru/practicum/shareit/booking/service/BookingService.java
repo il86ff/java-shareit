@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class BookingService {
-    private final String WRONG_PAGE_COUNT_OR_ITEM_AMOUNT = "количество страниц %s или предметов %s указано неверно";
+    private static final String WRONG_PAGE_COUNT_OR_ITEM_AMOUNT = "количество страниц %s или предметов %s указано неверно";
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserService userService;
