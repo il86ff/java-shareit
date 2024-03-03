@@ -2,6 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -28,6 +31,8 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserService userService;
+
+    private final static String WRONG_PAGE_COUNT_OR_ITEM_AMOUNT = "количество страниц %s или предметов %s указано неверно";
 
     @Transactional
     public Booking create(BookingDto bookingDto, Long id) {
@@ -74,13 +79,18 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public Collection<Booking> getAllBookingByUser(Long id, BookingStatus state) {
-        LocalDateTime time = LocalDateTime.now();
-        Collection<Booking> collectionBooking = bookingRepository.findByBookerIdOrderByStartDesc(id);
-        if (collectionBooking.isEmpty()) {
-            throw new EmptyResultSet("Бронирований пользователя не существует");
+    public Collection<Booking> getAllBookingByUser(Long id, BookingStatus state, Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "start"));
+        if (from >= 0 && size > 0) {
+            LocalDateTime time = LocalDateTime.now();
+            Collection<Booking> collectionBooking = bookingRepository.findByBookerIdOrderByStartDesc(id, pageable);
+            if (collectionBooking.isEmpty()) {
+                throw new EmptyResultSet("Бронирований пользователя не существует");
+            } else {
+                return getAllBookingByBookerId(state, collectionBooking, time);
+            }
         } else {
-            return getAllBookingByBookerId(state, collectionBooking, time);
+            throw new ValidationItemException(String.format(WRONG_PAGE_COUNT_OR_ITEM_AMOUNT, from, size));
         }
     }
 
@@ -99,13 +109,18 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public Collection<Booking> getAllBookingItemByUser(Long id, BookingStatus state) {
-        LocalDateTime time = LocalDateTime.now();
-        Collection<Booking> collectionBooking = bookingRepository.findByItem_User_IdOrderByStartDesc(id);
-        if (collectionBooking.isEmpty()) {
-            throw new EmptyResultSet("Ошибка доступа к получению данных, пользователь не существует");
+    public Collection<Booking> getAllBookingItemByUser(Long id, BookingStatus state, Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "start"));
+        if (from >= 0 && size > 0) {
+            LocalDateTime time = LocalDateTime.now();
+            Collection<Booking> collectionBooking = bookingRepository.findByItem_User_IdOrderByStartDesc(id, pageable);
+            if (collectionBooking.isEmpty()) {
+                throw new EmptyResultSet("Ошибка доступа к получению данных, пользователь не существует");
+            } else {
+                return getAllBookingByBookerId(state, collectionBooking, time);
+            }
         } else {
-            return getAllBookingByBookerId(state, collectionBooking, time);
+            throw new ValidationItemException(String.format(WRONG_PAGE_COUNT_OR_ITEM_AMOUNT, from, size));
         }
 
     }

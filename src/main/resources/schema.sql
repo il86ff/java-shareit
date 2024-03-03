@@ -2,6 +2,7 @@
 --DROP TABLE items CASCADE;
 --DROP TABLE booking CASCADE;
 --DROP TABLE comment CASCADE;
+--DROP TABLE request CASCADE;
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS items (
     description varchar(100),
     available BOOLEAN,
     user_id BIGINT,
+    request_id BIGINT,
     booking_id BIGINT);
 
 CREATE TABLE IF NOT EXISTS booking (
@@ -29,4 +31,10 @@ CREATE TABLE IF NOT EXISTS comment (
     text varchar(100),
     item_id BIGINT,
     author_name varchar(100),
+    created TIMESTAMP WITHOUT TIME ZONE);
+
+CREATE TABLE IF NOT EXISTS request (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    description varchar(100),
+    requester_id BIGINT,
     created TIMESTAMP WITHOUT TIME ZONE);
