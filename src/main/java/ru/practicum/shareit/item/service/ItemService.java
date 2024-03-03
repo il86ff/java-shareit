@@ -144,7 +144,7 @@ public class ItemService {
         }
     }
 
-    public List<Item> getByRequestId (Long requestId) {
+    public List<Item> getByRequestId(Long requestId) {
         return itemRepository.findByRequestId(requestId);
     }
 

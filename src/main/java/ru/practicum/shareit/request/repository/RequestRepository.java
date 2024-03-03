@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.request.entity.ItemRequest;
 
 import java.util.List;
+
 @Repository
 public interface RequestRepository extends JpaRepository<ItemRequest, Long> {
 
