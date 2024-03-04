@@ -18,35 +18,21 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.entity.User;
 import ru.practicum.shareit.user.service.UserService;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {
-    @Mock
-    BookingRepository bookingRepository;
-    @Mock
-    ItemRepository itemRepository;
-    @Mock
-    UserService userService;
-    BookingService bookingService;
-
-    @BeforeEach
-    void init() {
-        bookingService = new BookingService(bookingRepository, itemRepository, userService);
-    }
-
     private final User user = new User(
             1L,
             "name",
@@ -60,23 +46,12 @@ public class BookingServiceTest {
             null,
             user
     );
-
-    private final Item itemAvailableFalse = new Item(
-            1L,
-            "перчатки2",
-            "резиновые2",
-            false,
-            null,
-            user
-    );
-
     private final BookingDto bookingDto = new BookingDto(
             1L,
             LocalDateTime.of(2024, 10, 10, 10, 10, 0),
             LocalDateTime.of(2024, 12, 10, 10, 10, 0),
             item.getId()
     );
-
     private final Booking booking = new Booking(
             1L,
             LocalDateTime.of(2024, 10, 10, 10, 10, 0),
@@ -85,7 +60,6 @@ public class BookingServiceTest {
             user,
             BookingStatus.REJECTED
     );
-
     private final Booking bookingWaiting = new Booking(
             2L,
             LocalDateTime.of(2024, 10, 10, 10, 10, 0),
@@ -94,6 +68,26 @@ public class BookingServiceTest {
             user,
             BookingStatus.WAITING
     );
+    private final Item itemAvailableFalse = new Item(
+            1L,
+            "перчатки2",
+            "резиновые2",
+            false,
+            null,
+            user
+    );
+    @Mock
+    BookingRepository bookingRepository;
+    @Mock
+    ItemRepository itemRepository;
+    @Mock
+    UserService userService;
+    BookingService bookingService;
+
+    @BeforeEach
+    void init() {
+        bookingService = new BookingService(bookingRepository, itemRepository, userService);
+    }
 
     @Test
     void shouldThrowExceptionWhenCreateWithWrongUserId() {
@@ -266,7 +260,7 @@ public class BookingServiceTest {
         );
         when(bookingRepository.findByItem_User_IdOrderByStartDesc(any(), any()))
                 .thenReturn(List.of(bookingCurrent));
-        
+
 
         assertThrows(UnknownState.class,
                 () -> bookingService.getAllBookingItemByUser(user.getId(),
