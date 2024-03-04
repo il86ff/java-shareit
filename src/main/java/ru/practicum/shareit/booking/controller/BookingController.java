@@ -49,7 +49,7 @@ public class BookingController {
         return bookingService.getBookingByUser(bookingId, userId);
     }
 
-    @GetMapping("/owner") //Если есть вещь, нужно найти брони и выдать
+    @GetMapping("/owner")
     public Collection<Booking> getAllBookingItemByUser(@Valid @RequestHeader("X-Sharer-User-Id") Long id,
                                                        @RequestParam(defaultValue = "ALL") BookingStatus state,
                                                        @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
