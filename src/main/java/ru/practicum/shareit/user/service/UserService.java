@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,7 +31,7 @@ public class UserService {
         try {
             User newUser = UserMapper.dtoToUser(userDto);
             return userRepository.save(newUser);
-        } catch (ConstraintViolationException | NullPointerException s) {
+        } catch (ConstraintViolationException | NullPointerException | DataIntegrityViolationException s) {
             throw new DuplicateEmailException(String.format("Не верный email у пользователя %s", userDto.getId()));
         }
     }

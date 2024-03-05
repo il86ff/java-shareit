@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.practicum.shareit.exception.DuplicateEmailException;
 import ru.practicum.shareit.exception.EmptyEmailException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -28,6 +29,14 @@ public class UserServiceTest {
         assertThrows(EmptyEmailException.class,
                 () -> userService.create(new UserDto(999L, "Someone", null)));
     }
+
+    @Test
+    void shouldThrowExceptionIfEmailIsDuplicate() {
+        userService.create(new UserDto(999L, "Someone", "email@mail.ru"));
+        assertThrows(DuplicateEmailException.class,
+                () -> userService.create(new UserDto(null, "Someone1", "email@mail.ru")));
+    }
+
 
     @Test
     void shouldThrowExceptionIfIdIsInvalid() {
