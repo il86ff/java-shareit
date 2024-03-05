@@ -35,7 +35,7 @@ public class ItemControllerTest {
     private final Item testItem = new Item(1L, "item", "item for job", true, null, testUser);
     private final Comment comment = new Comment(1L, "comment", testItem, testUser.getName(), LocalDateTime.of(2021, 2, 2, 2, 2));
     private final ItemDataDto testItemDataDto = new ItemDataDto(1L, "test", "item for job", true, null, null, null, testUser, null);
-    
+
     @Autowired
     ObjectMapper objectMapper;
     @MockBean
