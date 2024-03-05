@@ -90,7 +90,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenCreateWithWrongUserId() {
+    void create_shouldThrowExceptionWhenCreateWithWrongUserId() {
         when(userService.getById(anyLong()))
                 .thenThrow(NotFoundException.class);
 
@@ -102,7 +102,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenCreateWithWrongItemId() {
+    void create_shouldThrowExceptionWhenCreateWithWrongItemId() {
         when(itemRepository.findById(anyLong()))
                 .thenThrow(NotFoundException.class);
 
@@ -111,7 +111,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenItemAvailableFalse() {
+    void create_shouldThrowExceptionWhenItemAvailableFalse() {
         BookingDto bookingDtoFalse = new BookingDto(
                 2L,
                 LocalDateTime.of(2024, 10, 10, 10, 10, 0),
@@ -129,7 +129,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenItemBookingByHimself() {
+    void create_shouldThrowExceptionWhenItemBookingByHimself() {
         when(userService.getById(anyLong()))
                 .thenReturn(user);
 
@@ -141,13 +141,13 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenUpdateWrongId() {
+    void update_shouldThrowExceptionWhenUpdateWrongId() {
         assertThrows(NotFoundException.class,
                 () -> bookingService.update(bookingDto.getId(), user.getId(), true));
     }
 
     @Test
-    void shouldThrowExceptionWhenUpdateStatusRejected() {
+    void update_shouldThrowExceptionWhenUpdateStatusRejected() {
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
 
         assertThrows(ValidationItemException.class,
@@ -155,7 +155,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionIfNotOwnerUpdatingStatus() {
+    void update_shouldThrowExceptionIfNotOwnerUpdatingStatus() {
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(bookingWaiting));
 
         assertThrows(NotFoundException.class,
@@ -163,7 +163,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void getById_shouldReturnBooking() {
+    void getBookingByUser_shouldReturnBooking() {
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
 
         Booking returnedBooking = bookingService.getBookingByUser(booking.getId(), user.getId());
@@ -173,7 +173,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldReturnBookingsIfStateIsCurrentAndGetBookingsByOwner() {
+    void getAllBookingItemByUser_shouldReturnBookingsIfStateIsCurrentAndGetBookingsByOwner() {
         Booking bookingCurrent = new Booking(
                 3L,
                 LocalDateTime.of(2023, 10, 10, 10, 10, 0),
@@ -192,7 +192,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldReturnBookingsIfStateIsRejected() {
+    void getAllBookingItemByUser_shouldReturnBookingsIfStateIsRejected() {
         Booking bookingCurrent = new Booking(
                 3L,
                 LocalDateTime.of(2023, 10, 10, 10, 10, 0),
@@ -211,7 +211,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldReturnBookingsIfStateIsWaiting() {
+    void getAllBookingItemByUser_shouldReturnBookingsIfStateIsWaiting() {
         Booking bookingCurrent = new Booking(
                 3L,
                 LocalDateTime.of(2023, 10, 10, 10, 10, 0),
@@ -230,7 +230,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldReturnBookingsIfStateIsAll() {
+    void getAllBookingItemByUser_shouldReturnBookingsIfStateIsAll() {
         Booking bookingCurrent = new Booking(
                 3L,
                 LocalDateTime.of(2023, 10, 10, 10, 10, 0),
@@ -249,7 +249,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenStateIsUnsupported() {
+    void getAllBookingItemByUser_shouldThrowExceptionWhenStateIsUnsupported() {
         Booking bookingCurrent = new Booking(
                 3L,
                 LocalDateTime.of(2023, 10, 10, 10, 10, 0),

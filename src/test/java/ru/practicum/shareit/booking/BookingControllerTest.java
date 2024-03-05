@@ -68,7 +68,7 @@ public class BookingControllerTest {
 
     @SneakyThrows
     @Test
-    void shouldCorrectlyCreateBooking() {
+    void create_shouldCorrectlyCreateBooking() {
         when(bookingService.create(any(),anyLong()))
                 .thenReturn(booking);
 
@@ -87,7 +87,7 @@ public class BookingControllerTest {
 
     @SneakyThrows
     @Test
-    void shouldCorrectlyReturnBookingByID() {
+    void getBookingByUser_shouldCorrectlyReturnBookingByID() {
         when(bookingService.getBookingByUser(anyLong(),anyLong()))
                 .thenReturn(booking);
 
@@ -108,7 +108,7 @@ public class BookingControllerTest {
 
     @SneakyThrows
     @Test
-    void shouldCorrectlyReturnListOfBookings() {
+    void getAllBookingByUser_shouldCorrectlyReturnListOfBookings() {
         when(bookingService.getAllBookingByUser(any(Long.class), any(BookingStatus.class),
                 any(Integer.class), nullable(Integer.class)))
                 .thenReturn(List.of(booking));
@@ -130,7 +130,7 @@ public class BookingControllerTest {
 
     @SneakyThrows
     @Test
-    void shouldCorrectlyUpdateBooking() {
+    void update_shouldCorrectlyUpdateBooking() {
         when(bookingService.update(any(Long.class), any(Long.class), any(Boolean.class)))
                 .thenReturn(booking);
 
@@ -152,7 +152,7 @@ public class BookingControllerTest {
 
     @SneakyThrows
     @Test
-    void shouldCorrectlyReturnListOfBookingsByOwner() {
+    void getAllBookingItemByUser_shouldCorrectlyReturnListOfBookingsByOwner() {
         when(bookingService.getAllBookingItemByUser(any(Long.class), any(BookingStatus.class),
                 any(Integer.class), nullable(Integer.class)))
                 .thenReturn(List.of(booking));
