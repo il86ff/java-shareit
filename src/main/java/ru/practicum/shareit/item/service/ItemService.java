@@ -144,6 +144,7 @@ public class ItemService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<Item> getByRequestId(Long requestId) {
         return itemRepository.findByRequestId(requestId);
     }
