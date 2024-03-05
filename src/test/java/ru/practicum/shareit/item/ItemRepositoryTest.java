@@ -20,7 +20,7 @@ public class ItemRepositoryTest {
     private ItemRepository itemRepository;
 
     @Test
-    void getById_shouldThrowExceptionIfWrongId() {
+    void shouldThrowExceptionIfWrongId() {
         ItemService itemService = new ItemService(itemRepository, null, null, null);
         when(itemRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
