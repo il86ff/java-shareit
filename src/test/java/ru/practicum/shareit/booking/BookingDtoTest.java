@@ -14,14 +14,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 public class BookingDtoTest {
-    @Autowired
-    private JacksonTester<BookingDto> json;
     private final BookingDto booking = new BookingDto(
             1L,
             LocalDateTime.of(2020, 10, 10, 10, 10, 0),
             LocalDateTime.of(2020, 12, 10, 10, 10, 0),
             1L
     );
+    @Autowired
+    private JacksonTester<BookingDto> json;
+
     @SneakyThrows
     @Test
     void testBookingDto() {
