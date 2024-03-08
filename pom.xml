@@ -141,6 +141,8 @@
 					<configuration>
 						<excludes>
 							<exclude>**/*RestExceptionHandler.class</exclude>
+							<exclude>**/*ItemDataDto.class</exclude>
+							<exclude>**/*UserMapper.class</exclude>
 						</excludes>
 						<output>file</output>
 					</configuration>
