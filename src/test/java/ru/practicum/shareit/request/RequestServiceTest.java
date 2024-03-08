@@ -108,9 +108,9 @@ public class RequestServiceTest {
 
     @Test
     void getListAllRequest_shouldThrowExceptionIfFromIsIncorrect() {
-        userService.create(userDto);
+        User testUser = userService.create(userDto);
         assertThrows(ValidationItemException.class,
-                () -> requestService.getListAllRequest(1L, -2, 10));
+                () -> requestService.getListAllRequest(testUser.getId(), -2, 10));
     }
 
     @Test
