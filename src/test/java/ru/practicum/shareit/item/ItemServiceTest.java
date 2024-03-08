@@ -7,16 +7,24 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.entity.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.ItemOwnerMismatchException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationItemException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDataDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.entity.Comment;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.entity.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ItemServiceTest {
     private final ItemService itemService;
     private final UserService userService;
+    private final BookingService bookingService;
+    private final BookingRepository bookingRepository;
 
     private final UserDto userDto = new UserDto(
             1L,
@@ -42,7 +52,22 @@ public class ItemServiceTest {
             "email2@email"
     );
 
+    private final User user = new User(
+            1L,
+            "name",
+            "email@email"
+    );
+
     private final ItemDto itemDto = new ItemDto(1L, "itemDto", "itemDtoDesc", true, null);
+    private final Item item = new Item(
+            1L,
+            "перчатки",
+            "резиновые",
+            true,
+            null,
+            user
+    );
+    private final Comment comment = new Comment(1L, "test", item, user.getName(), LocalDateTime.now());
 
     @Test
     void create_shouldThrowExceptionIfUserIdIsIncorrect() {
@@ -67,10 +92,10 @@ public class ItemServiceTest {
 
     @Test
     void update_shouldThrowExceptionIfItemIdIsIncorrect() {
-        userService.create(userDto);
-        itemService.create(itemDto, 1L);
+        User user1 = userService.create(userDto);
+        itemService.create(itemDto, user1.getId());
         assertThrows(NotFoundException.class,
-                () -> itemService.update(itemDto, 2L, 2L));
+                () -> itemService.update(itemDto, 2L, user1.getId()));
     }
 
     @Test
@@ -144,5 +169,71 @@ public class ItemServiceTest {
         Collection<Item> items = itemService.getItemBySearch(itemDto.getName());
 
         assertFalse(items.isEmpty());
+    }
+
+    @Test
+    void search_shouldReturnEmptyList() {
+        Collection<Item> items = itemService.getItemBySearch("");
+        assertTrue(items.isEmpty());
+    }
+
+    @Test
+    void validationItem_shouldThrowValidationItemExceptionName() {
+        assertThrows(ValidationItemException.class,
+                () -> itemService.validationItem(new ItemDto(null, null, "desc", true, null)));
+    }
+
+    @Test
+    void validationItem_shouldThrowValidationItemExceptionDescription() {
+        assertThrows(ValidationItemException.class,
+                () -> itemService.validationItem(new ItemDto(null, "Name", "", true, null)));
+    }
+
+    @Test
+    void validationItem_shouldThrowValidationItemExceptionAvailable() {
+        assertThrows(ValidationItemException.class,
+                () -> itemService.validationItem(new ItemDto(null, "Name", "Desc", null, null)));
+    }
+
+    @Test
+    void comment_shouldAddComment() {
+        User createdUser = userService.create(userDto);
+        User createdBooker = userService.create(userDto2);
+        Item createdItem = itemService.create(itemDto, createdUser.getId());
+        BookingDto createdBookingDto = new BookingDto(
+                null,
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2),
+                createdItem.getId()
+        );
+        Booking createdBooking =  bookingService.create(createdBookingDto, createdBooker.getId());
+        createdBooking.setStart(createdBooking.getStart().minusDays(2));
+        createdBooking.setEnd(createdBooking.getEnd().minusDays(2));
+        bookingRepository.save(createdBooking);
+        Comment createdComment = itemService.addComment(new CommentDto(null, "comment"), createdBooker.getId(), createdItem.getId());
+
+        assertEquals(createdComment.getAuthorName(), createdBooker.getName());
+        assertEquals(createdComment.getItem().getId(), createdItem.getId());
+
+
+    }
+
+    @Test
+    void comment_shouldThrowException() {
+        User createdUser = userService.create(userDto);
+        User createdBooker = userService.create(userDto2);
+        Item createdItem = itemService.create(itemDto, createdUser.getId());
+        BookingDto createdBookingDto = new BookingDto(
+                null,
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2),
+                createdItem.getId()
+        );
+        Booking createdBooking =  bookingService.create(createdBookingDto, createdBooker.getId());
+
+        assertThrows(ValidationItemException.class,
+                () -> itemService.addComment(new CommentDto(null, "comment"), createdBooker.getId(), createdItem.getId()));
+
+
     }
 }

@@ -21,7 +21,7 @@ import java.util.Set;
 public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(
+    private ResponseEntity<Map<String, String>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -36,7 +36,7 @@ public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Set<String>> handleException(NotFoundException exception) {
+    private ResponseEntity<Set<String>> handleException(NotFoundException exception) {
         Set<String> messages = new HashSet<>();
         messages.add(exception.getMessage());
         log.error("Ошибка поиска: {}", messages);
@@ -46,7 +46,7 @@ public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
     }
 
     @ExceptionHandler(EmptyEmailException.class)
-    public ResponseEntity<Set<String>> handleException(EmptyEmailException exception) {
+    private ResponseEntity<Set<String>> handleException(EmptyEmailException exception) {
         Set<String> messages = new HashSet<>();
         messages.add(exception.getMessage());
         log.error("Ошибка поиска: {}", messages);
@@ -56,7 +56,7 @@ public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
     }
 
     @ExceptionHandler({DuplicateEmailException.class})
-    public ResponseEntity<Set<String>> handleException(DuplicateEmailException exception) {
+    private ResponseEntity<Set<String>> handleException(DuplicateEmailException exception) {
         Set<String> messages = new HashSet<>();
         messages.add(exception.getMessage());
         log.error("Ошибка заполнения тела запроса: {}", messages);
@@ -66,7 +66,7 @@ public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
     }
 
     @ExceptionHandler({EmptyResultSet.class})
-    public ResponseEntity<Set<String>> handleException(EmptyResultSet exception) {
+    private ResponseEntity<Set<String>> handleException(EmptyResultSet exception) {
         Set<String> messages = new HashSet<>();
         messages.add(exception.getMessage());
         log.error("Ошибка заполнения тела запроса: {}", messages);
@@ -76,7 +76,7 @@ public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
     }
 
     @ExceptionHandler(ValidationItemException.class)
-    public ResponseEntity<Set<String>> handleException(ValidationItemException exception) {
+    private ResponseEntity<Set<String>> handleException(ValidationItemException exception) {
         Set<String> messages = new HashSet<>();
         messages.add(exception.getMessage());
         log.error("Ошибка валидации предмета: {}", messages);
@@ -86,7 +86,7 @@ public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
     }
 
     @ExceptionHandler(ItemOwnerMismatchException.class)
-    public ResponseEntity<Set<String>> handleException(ItemOwnerMismatchException exception) {
+    private ResponseEntity<Set<String>> handleException(ItemOwnerMismatchException exception) {
         Set<String> messages = new HashSet<>();
         messages.add(exception.getMessage());
         log.error("Ошибка обновление предмета: {}", messages);
@@ -96,7 +96,7 @@ public class RestExceptionHandler extends ExceptionHandlerExceptionResolver {
     }
 
     @ExceptionHandler(UnknownState.class)
-    public ResponseEntity<UnknownStateException> handleException(UnknownState exception) {
+    private ResponseEntity<UnknownStateException> handleException(UnknownState exception) {
         Set<String> messages = new HashSet<>();
         messages.add(exception.getMessage());
         log.error("Unknown State: {}", messages);

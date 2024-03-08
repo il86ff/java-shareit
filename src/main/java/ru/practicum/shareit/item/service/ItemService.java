@@ -149,7 +149,7 @@ public class ItemService {
         return itemRepository.findByRequestId(requestId);
     }
 
-    private void validationItem(ItemDto itemDto) {
+    public void validationItem(ItemDto itemDto) {
         if (itemDto.getName() == null || itemDto.getName().isBlank()) {
             throw new ValidationItemException(String.format("У предмета %s нет названия", itemDto));
         }

@@ -75,12 +75,33 @@ public class UserServiceTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenEmailIsEquals() {
+        UserDto userDto = new UserDto(999L, "Someone", "email@email");
+        UserDto userDtoAnother = new UserDto(999L, "Someone", "emailNew@email");
+        userService.create(userDtoAnother);
+        User user = userService.create(userDto);
+        userDto.setEmail("emailNew@email");
+
+        assertThrows(DuplicateEmailException.class,
+                () -> userService.update(userDto, user.getId()));
+    }
+
+    @Test
     void shouldDeleteById() {
         UserDto userDto = new UserDto(null, "Someone", "email@email");
         User thisUser = userService.create(userDto);
         userService.deleteUser(thisUser.getId());
 
         assertTrue(userService.getAllUsers().isEmpty());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeleteWrongUser() {
+        UserDto userDto = new UserDto(999L, "Someone", "email@email");
+        User user = userService.create(userDto);
+
+        assertThrows(NotFoundException.class,
+                () -> userService.deleteUser(user.getId() + 1));
     }
 
     @Test
