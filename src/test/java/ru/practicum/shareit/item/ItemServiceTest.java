@@ -26,6 +26,8 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -154,12 +156,82 @@ public class ItemServiceTest {
     }
 
     @Test
+    void getItemById_shouldReturnItemIfOwnerRequestingWithCommentAndBooking() {
+        LocalDateTime time = LocalDateTime.now();
+        User createdUser = userService.create(userDto);
+        User createdBooker = userService.create(userDto2);
+        Item createdItem = itemService.create(itemDto, createdUser.getId());
+        BookingDto createdBookingDto = new BookingDto(
+                null,
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2),
+                createdItem.getId()
+        );
+        Booking createdBooking = bookingService.create(createdBookingDto, createdBooker.getId());
+        createdBooking.setStart(createdBooking.getStart().minusDays(2));
+        createdBooking.setEnd(createdBooking.getEnd().minusDays(2));
+        bookingRepository.save(createdBooking);
+        Comment createdComment = itemService.addComment(new CommentDto(null, "comment"), createdBooker.getId(), createdItem.getId());
+
+        ItemDataDto itemDataDto = itemService.getItemById(createdItem.getId(), createdUser.getId());
+
+        List<Booking> bookings = bookingRepository.findByItem_IdOrderByEndDesc(createdItem.getId()).stream().filter(i -> i.getStart().isBefore(time) && i.getItem().getUser().getId().equals(createdUser.getId())).collect(Collectors.toList());
+        List<Booking> bookingNext = bookingRepository.findByItem_IdOrderByEndDesc(createdItem.getId()).stream().filter(p -> p.getEnd().isAfter(time) && p.getStart().isAfter(time) && p.getItem().getUser().getId().equals(createdUser.getId())).collect(Collectors.toList());
+
+        assertFalse(bookings.isEmpty());
+        assertTrue(bookingNext.isEmpty());
+        assertEquals(createdComment.getAuthorName(), createdBooker.getName());
+        assertEquals(createdComment.getItem().getId(), createdItem.getId());
+        assertEquals(createdItem.getId(), itemDataDto.getId());
+        assertEquals(createdItem.getUser().getEmail(), itemDataDto.getUser().getEmail());
+    }
+
+    @Test
     void getItemByUser_shouldReturnByUserId() {
         User thisUser = userService.create(userDto);
         itemService.create(itemDto, thisUser.getId());
         Collection<ItemDataDto> items = itemService.getItemByUser(thisUser.getId());
 
         assertFalse(items.isEmpty());
+    }
+
+    @Test
+    void getItemByUser_shouldReturnByUserIdWithBookings() {
+        LocalDateTime time = LocalDateTime.now();
+        User createdUser = userService.create(userDto);
+        User createdBooker = userService.create(userDto2);
+        Item createdItem = itemService.create(itemDto, createdUser.getId());
+        BookingDto createdBookingDto = new BookingDto(
+                null,
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2),
+                createdItem.getId()
+        );
+        Booking createdBooking = bookingService.create(createdBookingDto, createdBooker.getId());
+        createdBooking.setStart(createdBooking.getStart().minusDays(2));
+        createdBooking.setEnd(createdBooking.getEnd().minusDays(2));
+        bookingRepository.save(createdBooking);
+        Comment createdComment = itemService.addComment(new CommentDto(null, "comment"), createdBooker.getId(), createdItem.getId());
+
+        Collection<ItemDataDto> itemDataDto = itemService.getItemByUser(createdUser.getId());
+
+        BookingDto createdBookingDtoNext = new BookingDto(
+                null,
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(2),
+                createdItem.getId()
+        );
+
+        Booking createdBookingNext = bookingService.create(createdBookingDtoNext, createdBooker.getId());
+
+        List<Booking> bookings = bookingRepository.findByItem_IdOrderByEndDesc(createdItem.getId()).stream().filter(i -> i.getStart().isBefore(time) && i.getItem().getUser().getId().equals(createdUser.getId())).collect(Collectors.toList());
+        List<Booking> bookingNext = bookingRepository.findByItem_IdOrderByEndDesc(createdItem.getId()).stream().filter(p -> p.getEnd().isAfter(time) && p.getStart().isAfter(time) && p.getItem().getUser().getId().equals(createdUser.getId())).collect(Collectors.toList());
+
+        assertFalse(bookings.isEmpty());
+        assertFalse(bookingNext.isEmpty());
+        assertEquals(createdComment.getAuthorName(), createdBooker.getName());
+        assertEquals(createdComment.getItem().getId(), createdItem.getId());
+        assertFalse(itemDataDto.isEmpty());
     }
 
     @Test
@@ -206,7 +278,7 @@ public class ItemServiceTest {
                 LocalDateTime.now().plusDays(2),
                 createdItem.getId()
         );
-        Booking createdBooking =  bookingService.create(createdBookingDto, createdBooker.getId());
+        Booking createdBooking = bookingService.create(createdBookingDto, createdBooker.getId());
         createdBooking.setStart(createdBooking.getStart().minusDays(2));
         createdBooking.setEnd(createdBooking.getEnd().minusDays(2));
         bookingRepository.save(createdBooking);
@@ -214,8 +286,6 @@ public class ItemServiceTest {
 
         assertEquals(createdComment.getAuthorName(), createdBooker.getName());
         assertEquals(createdComment.getItem().getId(), createdItem.getId());
-
-
     }
 
     @Test
@@ -229,7 +299,7 @@ public class ItemServiceTest {
                 LocalDateTime.now().plusDays(2),
                 createdItem.getId()
         );
-        Booking createdBooking =  bookingService.create(createdBookingDto, createdBooker.getId());
+        Booking createdBooking = bookingService.create(createdBookingDto, createdBooker.getId());
 
         assertThrows(ValidationItemException.class,
                 () -> itemService.addComment(new CommentDto(null, "comment"), createdBooker.getId(), createdItem.getId()));
