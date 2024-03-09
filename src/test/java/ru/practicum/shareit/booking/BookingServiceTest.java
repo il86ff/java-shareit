@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.dto.BookingStatus;
 import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.EmptyResultSet;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnknownState;
 import ru.practicum.shareit.exception.ValidationItemException;
@@ -267,5 +268,21 @@ public class BookingServiceTest {
                         BookingStatus.UNSUPPORTED_STATUS, 0, 10));
     }
 
+    @Test
+    void getAllBookingByUser_shouldThrowExceptionWhenNoBookings() {
+        when(bookingRepository.findByBookerIdOrderByStartDesc(anyLong(), any()))
+                .thenReturn(List.of());
+
+        assertThrows(EmptyResultSet.class,
+                () -> bookingService.getAllBookingByUser(1L, BookingStatus.ALL, 1, 1));
+    }
+
+    @Test
+    void getAllBookingByUser_shouldReturnBookings() {
+        when(bookingRepository.findByBookerIdOrderByStartDesc(anyLong(), any()))
+                .thenReturn(List.of(booking));
+
+        assertFalse(bookingService.getAllBookingByUser(1L, BookingStatus.ALL, 1, 1).isEmpty());
+    }
 
 }
