@@ -14,28 +14,28 @@ import java.util.List;
 @RequestMapping("/requests")
 @RequiredArgsConstructor
 public class RequestController {
-    private final RequestService service;
+    private final RequestService requestService;
 
     @PostMapping
     public ItemRequest create(@RequestHeader("X-Sharer-User-Id") Long userId,
                               @Valid @RequestBody ItemRequestDto request) {
-        return service.create(request, userId);
+        return requestService.create(request, userId);
     }
 
     @GetMapping
     public List<ItemGetRequestDTO> getByOwner(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return service.getListRequest(userId);
+        return requestService.getListRequest(userId);
     }
 
     @GetMapping("/all")
     public List<ItemGetRequestDTO> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
                                    @RequestParam(defaultValue = "0") Integer from,
                                    @RequestParam(required = false, defaultValue = "10") Integer size) {
-        return service.getListAllRequest(userId, from, size);
+        return requestService.getListAllRequest(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
     public ItemGetRequestDTO getById(@PathVariable("requestId") Long requestId, @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return service.getRequest(userId, requestId);
+        return requestService.getRequest(userId, requestId);
     }
 }
