@@ -144,7 +144,12 @@ public class ItemService {
         }
     }
 
-    private void validationItem(ItemDto itemDto) {
+    @Transactional(readOnly = true)
+    public List<Item> getByRequestId(Long requestId) {
+        return itemRepository.findByRequestId(requestId);
+    }
+
+    public void validationItem(ItemDto itemDto) {
         if (itemDto.getName() == null || itemDto.getName().isBlank()) {
             throw new ValidationItemException(String.format("У предмета %s нет названия", itemDto));
         }

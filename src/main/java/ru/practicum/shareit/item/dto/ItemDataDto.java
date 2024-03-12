@@ -22,6 +22,7 @@ public class ItemDataDto {
     private BookingDataDto nextBooking;
     private List<Comment> comments;
     private User user;
+    private Long requestId;
 
     @Override
     public boolean equals(Object o) {

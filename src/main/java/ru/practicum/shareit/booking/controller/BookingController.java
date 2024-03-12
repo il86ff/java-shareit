@@ -7,6 +7,8 @@ import ru.practicum.shareit.booking.entity.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 @RestController
@@ -33,9 +35,11 @@ public class BookingController {
     }
 
     @GetMapping
-    public Collection<Booking> getAllBookingByUser(@RequestHeader(HEADER_X_SHARER_USER_ID) Long id,
-                                                   @RequestParam(defaultValue = "ALL") BookingStatus state) {
-        return bookingService.getAllBookingByUser(id, state);
+    public Collection<Booking> getAllBookingByUser(@Valid @RequestHeader("X-Sharer-User-Id") Long id,
+                                                   @RequestParam(defaultValue = "ALL") BookingStatus state,
+                                                   @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                   @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.getAllBookingByUser(id, state, from, size);
     }
 
     @GetMapping("{bookingId}")
@@ -45,9 +49,11 @@ public class BookingController {
         return bookingService.getBookingByUser(bookingId, userId);
     }
 
-    @GetMapping("/owner") //Если есть вещь, нужно найти брони и выдать
-    public Collection<Booking> getAllBookingItemByUser(@Valid @RequestHeader(HEADER_X_SHARER_USER_ID) Long id,
-                                                       @RequestParam(defaultValue = "ALL") BookingStatus state) {
-        return bookingService.getAllBookingItemByUser(id, state);
+    @GetMapping("/owner")
+    public Collection<Booking> getAllBookingItemByUser(@Valid @RequestHeader("X-Sharer-User-Id") Long id,
+                                                       @RequestParam(defaultValue = "ALL") BookingStatus state,
+                                                       @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                       @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.getAllBookingItemByUser(id, state, from, size);
     }
 }
