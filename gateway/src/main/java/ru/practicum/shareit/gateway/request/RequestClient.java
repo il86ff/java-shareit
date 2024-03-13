@@ -15,6 +15,7 @@ import java.util.Map;
 @Service
 public class RequestClient extends BaseClient {
     private static final String API_PREFIX = "/requests";
+
     @Autowired
     public RequestClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
@@ -26,11 +27,11 @@ public class RequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> create(ItemRequestDto itemRequestDto, Long id) {
-        return post("/",id, itemRequestDto);
+        return post("/", id, itemRequestDto);
     }
 
     public ResponseEntity<Object> getListRequest(Long id) {
-        return get("/",id);
+        return get("/", id);
     }
 
     public ResponseEntity<Object> getListAllRequest(Long userId, Integer from, Integer size) {
