@@ -1,4 +1,5 @@
 package ru.practicum.shareit.server.request.controller;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.server.request.dto.ItemGetRequestDTO;
@@ -7,6 +8,8 @@ import ru.practicum.shareit.server.request.entity.ItemRequest;
 import ru.practicum.shareit.server.request.service.RequestService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
@@ -29,8 +32,8 @@ public class RequestController {
 
     @GetMapping("/all")
     public List<ItemGetRequestDTO> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                   @RequestParam(defaultValue = "0") Integer from,
-                                   @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                          @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                          @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
         return requestService.getListAllRequest(userId, from, size);
     }
 
