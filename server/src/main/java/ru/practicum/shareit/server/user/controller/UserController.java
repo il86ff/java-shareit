@@ -9,7 +9,7 @@ import ru.practicum.shareit.server.user.service.UserService;
 import javax.validation.Valid;
 import java.util.Collection;
 
-@RestController("ServerUserController")
+@RestController
 @RequestMapping(path = "/users")
 @AllArgsConstructor
 public class UserController {

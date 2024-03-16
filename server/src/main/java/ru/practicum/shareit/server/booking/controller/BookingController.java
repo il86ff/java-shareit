@@ -11,7 +11,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
-@RestController("ServerBookingController")
+@RestController
 @RequestMapping(path = "/bookings")
 public class BookingController {
     private static final String HEADER_X_SHARER_USER_ID = "X-Sharer-User-Id";

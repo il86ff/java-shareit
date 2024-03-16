@@ -13,7 +13,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
-@RestController("ServerRequestController")
+@RestController
 @RequestMapping("/requests")
 @RequiredArgsConstructor
 public class RequestController {

@@ -11,7 +11,7 @@ import ru.practicum.shareit.server.item.service.ItemService;
 import javax.validation.Valid;
 import java.util.Collection;
 
-@RestController("ServerItemController")
+@RestController
 @RequestMapping("/items")
 public class ItemController {
     private static final String HEADER_X_SHARER_USER_ID = "X-Sharer-User-Id";
